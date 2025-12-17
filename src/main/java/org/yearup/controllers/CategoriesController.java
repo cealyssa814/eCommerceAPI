@@ -1,70 +1,89 @@
 package org.yearup.controllers;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.CategoryDao;
 import org.yearup.data.ProductDao;
 import org.yearup.models.Category;
 import org.yearup.models.Product;
-
 import java.util.List;
-
-// add the annotations to make this a REST controller
-// add the annotation to make this controller the endpoint for the following url
-    // http://localhost:8080/categories
-// add annotation to allow cross site origin requests
+@RestController
+@RequestMapping("/categories")
+@CrossOrigin
 public class CategoriesController
 {
-    private CategoryDao categoryDao;
-    private ProductDao productDao;
-
-
-    // create an Autowired controller to inject the categoryDao and ProductDao
-
-    // add the appropriate annotation for a get action
+    private final CategoryDao categoryDao;
+    private final ProductDao productDao;
+    // FIX: Use constructor injection with @Autowired
+    @Autowired
+    public CategoriesController(CategoryDao categoryDao, ProductDao productDao)
+    {
+        this.categoryDao = categoryDao;
+        this.productDao = productDao;
+    }
+    // GET /categories
+    @GetMapping
     public List<Category> getAll()
     {
-        // find and return all categories
-        return null;
+        List<Category> categories = categoryDao.getAllCategories();
+        if (categories == null || categories.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No categories found.");
+        }
+        return categories;
     }
-
-    // add the appropriate annotation for a get action
+    // GET /categories/{id}
+    @GetMapping("/{id}")
     public Category getById(@PathVariable int id)
     {
-        // get the category by id
-        return null;
+        Category category = categoryDao.getById(id);
+        if (category == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found.");
+        }
+        return category;
     }
 
-    // the url to return all products in category 1 would look like this
-    // https://localhost:8080/categories/1/products
-    @GetMapping("{categoryId}/products")
+    @GetMapping("/{categoryId}/products")
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
-        // get a list of product by categoryId
-        return null;
+        List<Product> products = productDao.listByCategoryId(categoryId);
+        if (products == null || products.isEmpty()) { // FIX: prevent 500 if no products
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No products found for this category.");
+        }
+        return products;
     }
 
-    // add annotation to call this method for a POST action
-    // add annotation to ensure that only an ADMIN can call this function
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
     public Category addCategory(@RequestBody Category category)
     {
-        // insert the category
-        return null;
+        if (category == null || category.getName() == null || category.getName().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category name is required."); // FIX: validate input
+        }
+        return categoryDao.create(category);
     }
 
-    // add annotation to call this method for a PUT (update) action - the url path must include the categoryId
-    // add annotation to ensure that only an ADMIN can call this function
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
-        // update the category by id
+        if (categoryDao.getById(id) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found for update.");
+        }
+        categoryDao.update(id, category);
     }
-
-
-    // add annotation to call this method for a DELETE action - the url path must include the categoryId
-    // add annotation to ensure that only an ADMIN can call this function
+    // DELETE /categories/{id} (ADMIN only)
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
-        // delete the category by id
+        if (categoryDao.getById(id) == null) { // FIX: check existence
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found for deletion.");
+        }
+        categoryDao.delete(id); // FIX: DAO handles foreign key errors gracefully
     }
 }
+

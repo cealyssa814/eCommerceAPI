@@ -30,7 +30,7 @@ public class ProductsController
                                 @RequestParam(name="minPrice", required = false) BigDecimal minPrice,
                                 @RequestParam(name="maxPrice", required = false) BigDecimal maxPrice,
                                 @RequestParam(name="subCategory", required = false) String subCategory
-                                )
+    )
     {
         try
         {
@@ -80,8 +80,8 @@ public class ProductsController
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try
-        {
-            productDao.create(product);
+        {   //previously called create(), which causes duplicate products
+            productDao.update(id,product);
         }
         catch(Exception ex)
         {
@@ -108,3 +108,4 @@ public class ProductsController
         }
     }
 }
+

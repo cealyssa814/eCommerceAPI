@@ -1,5 +1,6 @@
 package org.yearup.security;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.yearup.security.jwt.JWTConfigurer;
 import org.yearup.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final TokenProvider tokenProvider;

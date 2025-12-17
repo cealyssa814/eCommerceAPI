@@ -43,4 +43,9 @@ public class ShoppingCart
         return total;
     }
 
+    public void addItem(int productId, int quantity) {
+    }
+
+    public void setTotal(BigDecimal total) {
+    }
 }
