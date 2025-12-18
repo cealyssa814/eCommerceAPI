@@ -2,7 +2,7 @@ Record Shop Capstone – RESTful E-Commerce API
 📌 Project Overview
 ===================
 
-EasyShop is a RESTful e-commerce backend built with Java, Spring Boot, and MySQL. This capstone demonstrates backend development concepts, including user authentication, role-based authorization, database persistence, and API testing.
+Record Shop is a RESTful e-commerce backend built with Java, Spring Boot, and MySQL. This capstone demonstrates backend development concepts, including user authentication, role-based authorization, database persistence, and API testing.
 
 The application supports user registration and login with JWT authentication, category management with admin permissions, and structured DAO-based database access.
 
@@ -50,13 +50,13 @@ This project requires a local MySQL database.
 **1️⃣ Create the database**
 
 ```sql
-CREATE DATABASE easyshop;
+CREATE DATABASE recordshop;
 ```
 
 **2️⃣ Update application.properties**
 
 ```properties
-datasource.url=jdbc:mysql://localhost:3306/easyshop
+datasource.url=jdbc:mysql://localhost:3306/recordshop
 datasource.username=root
 datasource.password=your_password
 ```
